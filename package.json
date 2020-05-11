@@ -1,0 +1,15 @@
+{
+  "name": "calypsojs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "2hands10fingers",
+  "license": "ISC",
+  "dependencies": {
+    "pcap": "^3.1.0",
+    "socketio": "^1.0.0"
+  }
+}
