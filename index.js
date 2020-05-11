@@ -8,7 +8,7 @@ alphabet.forEach( capital_letter => alphabet.push(capital_letter.toLowerCase()))
 
 io.on('connection', socket => {
 
-  session.on('packet', function (raw_packet) {
+  session.on('packet', raw_packet => {
     const packet = pcap.decode.packet(raw_packet)
     const payload = packet.payload.payload.payload
 
@@ -24,13 +24,21 @@ io.on('connection', socket => {
           .split('')
           .filter( i => alphabet.includes(i))
 
-          socket.emit('packet', JSON.stringify(buffArr))
-        }
-  }
-  })
+          const lePacket = {
+            size: buffer,
+            data: buffArr,
+          }
 
+          socket.emit('packet', JSON.stringify(lePacket))
+        }
+      }
+  })
 });
 
 
-
 server.listen(3000);
+
+
+
+
+

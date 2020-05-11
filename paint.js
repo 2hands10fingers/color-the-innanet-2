@@ -26,6 +26,8 @@ $(document).ready(function() {
       c.lineWidth = 0.75;
       c.stroke()
       c.fill();
+      c.shadowBlur = 10;
+      c.shadowColor = fill;
     }
 
     this.update = function() {
@@ -97,19 +99,20 @@ $(document).ready(function() {
 
   socket.on('packet', function(data) {
     var packet = JSON.parse(data)
-
-    if (packet.length > 0) {
+    var data = packet.data
+    var dataSize = packet.size
+    if (data.length > 0) {
 
       // 16777215
 
-      packet.forEach( i => {
+      data.forEach( i => {
         var rec = alphabet.indexOf(i) < 10 ? '0' + alphabet.indexOf(i) : alphabet.indexOf(i).toString()
         // console.log(rec)
         const randomNum = '1677'+ rec +'215'
         // console.log(randomNum)
           var fill = '#'+Math.floor(Math.random()*parseInt(randomNum)).toString(16).split();
           var stroke = '#'+Math.floor(Math.random()*(randomNum)).toString(16).split();
-          var radius= alphabet.indexOf(i) / 10
+          var radius= parseInt(dataSize) / 10
           var velocity = Math.random() * 2
           var x = Math.random() * innerWidth;
           var y = Math.random() * innerHeight;
