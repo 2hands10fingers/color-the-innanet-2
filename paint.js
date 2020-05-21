@@ -17,6 +17,7 @@ $(document).ready(function() {
     this.radius = radius;
     this.fill = fill;
     this.stroke = stroke;
+    this.direction = Math.PI * 2 * Math.random()
 
     this.draw = function() {
       c.beginPath();
@@ -28,6 +29,21 @@ $(document).ready(function() {
       c.fill();
       c.shadowBlur = 10;
       c.shadowColor = fill;
+      this.updatePosition()
+    }
+
+    this.updatePosition = function() {
+        var dx = this.x + this.dx * Math.cos(this.direction);
+        var dy = this.y + this.dy * Math.sin(this.direction);
+        
+        if (dx < 0 || dx > canvas.width || dy < 0 || dy > canvas.height) {
+          this.direction = Math.PI * 2 * Math.random();
+          this.updatePosition();
+        } else {
+          this.x = dx;
+          this.y = dy;
+        }
+      
     }
 
     this.update = function() {
@@ -36,6 +52,10 @@ $(document).ready(function() {
       this.y += this.dy;
       if (this.x + this.radius > innerWidth || this.x - this.radius < 0) { this.dx = -this.dx; }
       if (this.y + this.radius > innerHeight || this.y - this.radius < 0) { this.dy = -this.dy; }
+      
+
+
+
 
       this.draw();
 
@@ -104,6 +124,13 @@ $(document).ready(function() {
     if (data.length > 0) {
 
       // 16777215
+      function randomSizer(num) {
+        // console.log(num)
+        if (parseInt(num) >= 1000) {
+          return 100
+        }
+        return (parseInt(num) % 2 === 0) ? 1000 : 100
+      }
 
       data.forEach( i => {
         var rec = alphabet.indexOf(i) < 10 ? '0' + alphabet.indexOf(i) : alphabet.indexOf(i).toString()
@@ -112,7 +139,7 @@ $(document).ready(function() {
         // console.log(randomNum)
           var fill = '#'+Math.floor(Math.random()*parseInt(randomNum)).toString(16).split();
           var stroke = '#'+Math.floor(Math.random()*(randomNum)).toString(16).split();
-          var radius= parseInt(dataSize) / 10
+          var radius= parseInt(dataSize) / randomSizer(dataSize)
           var velocity = Math.random() * 2
           var x = Math.random() * innerWidth;
           var y = Math.random() * innerHeight;
@@ -126,9 +153,10 @@ $(document).ready(function() {
         })
       }
 
-      animate()
+      
 
 });
+  animate()
 
 });
 
