@@ -18,6 +18,7 @@ $(document).ready(function() {
     this.fill = fill;
     this.stroke = stroke;
     this.direction = Math.PI * 2 * Math.random()
+    this.active = true
 
     this.draw = function() {
       c.beginPath();
@@ -29,7 +30,20 @@ $(document).ready(function() {
       c.fill();
       c.shadowBlur = 10;
       c.shadowColor = fill;
-      this.updatePosition()
+      
+      var steps = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]
+      if (!this.active) {
+        
+        steps.forEach(function(i){
+          c.globalAlpha = i
+        })
+      } else {
+        steps.reverse()
+        steps.forEach(function(i) {
+          c.globalAlpha = i
+        })
+      }
+      // this.updatePosition()
     }
 
     this.updatePosition = function() {
@@ -60,6 +74,10 @@ $(document).ready(function() {
       this.draw();
 
     }
+
+    this.destroy = function() {
+      this.active = false
+    }
   }
 
   function animate() {
@@ -68,18 +86,25 @@ $(document).ready(function() {
 
     var length = circleArray.length
 
-    for (var i = 0; i < length; i++) {
-          circleArray[i].update();
+  
+   
+
+    if (length > 350) {
+
+      for (let i = 0; i < 100; i++) {
+        circleArray[i].destroy()
     }
-
-    if (length > 250) {
-
-      for (let i = 0; i < 50; i++) {
-        delete circleArray[i]
-
-      circleArray = circleArray.filter( i => i !== null)
-    }
+    circleArray = circleArray.filter( i => i.active)
+    
+//     for (var i = 0; i < length; i++) {
+//       circleArray[i].update();
+//
+  } 
+    
+  for (var i = 0; i < length; i++) {
+      circleArray[i].update();
   }
+  
 
     // WORDS ARE IMPORTANT
     c.fillStyle = "#0000008f"
@@ -127,7 +152,7 @@ $(document).ready(function() {
       function randomSizer(num) {
         // console.log(num)
         if (parseInt(num) >= 1000) {
-          return 100
+          return 10
         }
         return (parseInt(num) % 2 === 0) ? 1000 : 100
       }
@@ -139,12 +164,12 @@ $(document).ready(function() {
         // console.log(randomNum)
           var fill = '#'+Math.floor(Math.random()*parseInt(randomNum)).toString(16).split();
           var stroke = '#'+Math.floor(Math.random()*(randomNum)).toString(16).split();
-          var radius= parseInt(dataSize) / randomSizer(dataSize)
+          var radius= parseInt(dataSize) * 0.05
           var velocity = Math.random() * 2
           var x = Math.random() * innerWidth;
           var y = Math.random() * innerHeight;
-          var dx =  velocity * Math.random() / 10;
-          var dy = velocity * Math.random() / 10;
+          var dx =  velocity * Math.random() * Math.random() * 5;
+          var dy = velocity * Math.random() * Math.random() * 5;
 
           setTimeout(()=> {
             circleArray.push(new Circle(x, y , dx, dy, radius, fill, stroke))
