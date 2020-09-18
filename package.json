@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "run": "node index.js"
   },
   "author": "2hands10fingers",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "pcap": "^3.1.0",
     "socketio": "^1.0.0"
   }

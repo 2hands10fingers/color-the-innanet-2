@@ -4,12 +4,27 @@ $(document).ready(function() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   var c = canvas.getContext('2d');
-
   var piTwo = Math.PI * 2;
-  var v = 70;
+  var socket = io('http://localhost:3000');
+  var circleArray = []
 
-  function Circle(x, y, dx, dy, radius, fill, stroke) {
+  socket.on('packet', function(data) {
+    const circleData  = JSON.parse(data)
+    if (circleData.length > 0) {
 
+    for (let index = 0; index < circleData.length; index++) {
+      const element = circleData[index]
+      element.x = element.x * innerWidth
+      element.y = element.y * innerHeight
+      
+      circleArray.push(new Circle(element))
+    }
+    }
+  })
+
+  animate()
+
+  function Circle({x, y , dx, dy, radius, fill, stroke}) {
     this.x = x;
     this.y = y;
     this.dx = dx;
@@ -67,10 +82,6 @@ $(document).ready(function() {
       if (this.x + this.radius > innerWidth || this.x - this.radius < 0) { this.dx = -this.dx; }
       if (this.y + this.radius > innerHeight || this.y - this.radius < 0) { this.dy = -this.dy; }
       
-
-
-
-
       this.draw();
 
     }
@@ -83,29 +94,21 @@ $(document).ready(function() {
   function animate() {
     requestAnimationFrame(animate);
     c.clearRect(0, 0, innerWidth, innerHeight);
-
     var length = circleArray.length
 
-  
-   
+    if (length > 800) {
 
-    if (length > 350) {
-
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 200; i++) {
         circleArray[i].destroy()
-    }
+      }
+
     circleArray = circleArray.filter( i => i.active)
-    
-//     for (var i = 0; i < length; i++) {
-//       circleArray[i].update();
-//
   } 
     
-  for (var i = 0; i < length; i++) {
-      circleArray[i].update();
-  }
-  
-
+    for (var i = 0; i < length; i++) {
+        circleArray[i].update();
+    }
+    
     // WORDS ARE IMPORTANT
     c.fillStyle = "#0000008f"
     c.fillRect((canvas.width / 2) - 155 ,(canvas.height / 2.29),275,135)
@@ -132,56 +135,7 @@ $(document).ready(function() {
     c.font = "bold 19.5px Arial";
     c.fillText(" created by 2hands10fingers ", (canvas.width / 2) - 150, (canvas.height / 1.75));
     c.fillStyle = "black;"
-
   }
-
-
-
-  var socket = io('http://localhost:3000');
-  var circleArray = []
-  var alphabet = [...Array(26)].map((_, y) => String.fromCharCode(y + 65))
-  alphabet.forEach( capital_letter => alphabet.push(capital_letter.toLowerCase()))
-
-  socket.on('packet', function(data) {
-    var packet = JSON.parse(data)
-    var data = packet.data
-    var dataSize = packet.size
-    if (data.length > 0) {
-
-      // 16777215
-      function randomSizer(num) {
-        // console.log(num)
-        if (parseInt(num) >= 1000) {
-          return 10
-        }
-        return (parseInt(num) % 2 === 0) ? 1000 : 100
-      }
-
-      data.forEach( i => {
-        var rec = alphabet.indexOf(i) < 10 ? '0' + alphabet.indexOf(i) : alphabet.indexOf(i).toString()
-        // console.log(rec)
-        const randomNum = '1677'+ rec +'215'
-        // console.log(randomNum)
-          var fill = '#'+Math.floor(Math.random()*parseInt(randomNum)).toString(16).split();
-          var stroke = '#'+Math.floor(Math.random()*(randomNum)).toString(16).split();
-          var radius= parseInt(dataSize) * 0.05
-          var velocity = Math.random() * 2
-          var x = Math.random() * innerWidth;
-          var y = Math.random() * innerHeight;
-          var dx =  velocity * Math.random() * Math.random() * 5;
-          var dy = velocity * Math.random() * Math.random() * 5;
-
-          setTimeout(()=> {
-            circleArray.push(new Circle(x, y , dx, dy, radius, fill, stroke))
-          }, 2000);
-
-        })
-      }
-
-      
-
-});
-  animate()
 
 });
 
