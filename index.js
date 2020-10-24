@@ -9,47 +9,59 @@ function openLocalhost(site) {
 }
 
 
+function socketSend(buffer, size, sendObj) {
+    let sizeMarker = 0
+
+    while(size !== sizeMarker) {
+      const circleData = buffer.toString('hex')
+      const hex = circleData.slice(0 + sizeMarker, sizeMarker + 6)
+
+      if (hex.length === 6) {
+        console.log(hex)
+
+        const dataPartial = {
+          fill: '#' + hex,
+          stroke: hex.slice(0,3),
+          radius: parseInt(size) / 100 ,
+          velocity: size * 0.05,
+          x: Math.random(),
+          y: Math.random(),
+          dy: (size / 2) * Math.random(),
+          dx: (size / 2) * Math.random(),
+        }
+
+        sendObj.emit('packet', JSON.stringify(dataPartial))
+
+        sizeMarker += hex.length
+    }
+  }
+}
+
 try {
   console.log('INITIALIZING')
   console.log(process.env)
   if (process.env.FILE_PATH){
-    
+
     openLocalhost(process.env.FILE_PATH)
   }
-  
+
   console.log('CONNECTING TO SOCKET...')
-  
+
   io.on('connection', socket => {
-    
+
     session.on('packet', raw_packet => {
       const packet = pcap.decode.packet(raw_packet)
       const payload = packet.payload.payload.payload
-   
+
       if (payload && payload.constructor.name === "TCP"){
         console.log(payload.constructor.name)
         const { data } = payload
 
         if (data !== null ) {
           const buffer = data
-          const size = Buffer.byteLength(buffer)
-          const circleData = buffer
-          .toString('hex')
-          .match(/([a-zA-Z\d]{6})/g)
-          .map(hex => {
-            return {
-              fill: '#' + hex,
-              stoke: hex.slice(0,3),
-              radius: parseInt(size) / 100 ,
-              velocity: size * 0.05,
-              x: Math.random(),
-              y: Math.random(),
-              dy: (size / 2) * Math.random(),
-              dx: (size / 2) * Math.random(),
-            }
-          })
-        
-          socket.emit('packet', JSON.stringify(circleData))
-        
+          let size = Buffer.byteLength(buffer)
+
+          socketSend(buffer, size, socket);
         }
       }
     })
@@ -82,7 +94,7 @@ server.listen(3000);
 
 // these are all equal:
 // decimal: 220
-// hexadecimal: 0xdc, 
+// hexadecimal: 0xdc,
 // binary: 1101 1100
 
 // colors are represented as "hex codes"
